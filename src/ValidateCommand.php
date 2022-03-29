@@ -61,6 +61,7 @@ class ValidateCommand extends Command {
 			->addOption( 'gh-action', null, InputOption::VALUE_NONE, 'Output validation issues using GitHub Action command syntax.' )
 			->addOption( 'basedir', null, InputOption::VALUE_REQUIRED, 'Output file paths in this directory relative to it.' )
 			->addOption( 'no-strict', null, InputOption::VALUE_NONE, 'Do not exit with a failure code if only warnings are found.' )
+			->addOption( 'require-entry', null, InputOption::VALUE_NONE, 'Exit with a failure code if no changelog files are found.' )
 			->addArgument( 'files', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'Files to check. By default, all change files in the changelog directory are checked.' )
 			->setHelp(
 				<<<EOF
@@ -202,6 +203,11 @@ EOF
 				}
 			}
 			sort( $files );
+		}
+
+		if ( $input->getOption( 'require-entry' ) && 0 === count( $files ) ) {
+			$output->writeln( 'A valid changelog entry is required', OutputInterface::VERBOSITY_VERBOSE );
+			return 1;
 		}
 
 		foreach ( $files as $filename ) {
